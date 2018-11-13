@@ -19,7 +19,7 @@ public:
 	void exec(const char *terminal_cmd, std::vector<std::string> &terminal_feedback, std::vector<std::string> &error_list, bool realtime_terminal_feedback);
 	
 	// DEBUG FUNCTIONS
-	void toggle_debug(m_debug = !m_debug);
+	void toggle_debug() { m_debug != m_debug; }
 	
 private:
 	bool m_debug;	// default FALSE. Toggle to true with debug_toggle()
