@@ -2,37 +2,59 @@
 #define COMMAND_HPP
 
 #include <iostream>
-#include <vector>
+#include <stdexcept>
+#include <stdio.h>
 #include <string>
+#include <unistd.h>
+#include <vector>
+#include <deque>
 
 class command {
 public:
-	command();	// ctor
-	~command();	// dtor
+    command();
+    virtual ~command();
 	
-	// Main function. Fire and forget. Terminal feedback is not saved, but if
-	// set to true, it will be printed on the screen.
-	void exec(const char *terminal_cmd, bool realtime_terminal_feedback);
-	
-	// Overloaded main function. Takes two vector strings as arguments, as well
-	// as printing to screen if set to true
-	void exec(const char *terminal_cmd, std::vector<std::string> &terminal_feedback, std::vector<std::string> &error_list, bool realtime_terminal_feedback);
-	
-	// DEBUG FUNCTIONS
-	void toggle_debug() { m_debug != m_debug; }
-	
+	void toggle_debug();	// toggles the state of m_debug
+    void exec(const char *cmd, std::vector<std::string> &terminal_output, std::vector<std::string> &error_list);
+
 private:
-	bool m_debug;	// default FALSE. Toggle to true with debug_toggle()
+	bool m_debug;	// if true, realtime terminal output will be printed to screen as it happens. Otherwise, it goes to the vector, or is lost forever.
 };
 
-command::command() {}
-command::~command() {}
+command::command() {}   // ctor
+command::~command() {}  // dtor
 
-void command::exec(const char *terminal_cmd, bool realtime_terminal_feedback) {
-	
+void command::toggle_debug() {
+	m_debug = !m_debug;
+	std::cout << "debug = [" << m_debug << "]" << std::endl;
 }
 
-void command::exec(const char *terminal_cmd, std::vector<std::string> &terminal_feedback, std::vector<std::string> &error_list, bool realtime_terminal_feedback) {
-	
+void command::exec(const char* cmd, std::vector<std::string> &terminal_output, std::vector<std::string> &error_list) {
+    char buffer[128];
+    FILE* pipe = popen(cmd, "r");
+    if (!pipe) {
+        error_list.push_back("popen() failed!");
+        if (m_debug)
+            std::cout << "popen() failed!" << std::endl;
+        throw::std::runtime_error("popen() failed!");
+    }
+    try {
+        while (!feof(pipe)) {
+            if (fgets(buffer, 128, pipe) != NULL) {
+                std::string temp = buffer;
+                terminal_output.push_back(temp);
+                if (m_debug)
+                    std::cout << temp;
+            }
+        }
+    } catch (...) {
+        pclose(pipe);
+        error_list.push_back("fgets failed!");
+        if (m_debug)
+            std::cout << "fgets failed!" << std::endl;
+        throw;
+    }
+    pclose(pipe);
 }
-#endif
+
+#endif // COMMAND_HPP
