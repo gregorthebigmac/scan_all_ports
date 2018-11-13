@@ -1,9 +1,7 @@
 #ifndef HOST_HPP
 #define HOST_HPP
 
-#include <iostream>
-#include <string>
-#include <vector>
+#include "command.hpp"
 
 class host {
 public:

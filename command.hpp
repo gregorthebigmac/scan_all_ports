@@ -25,4 +25,14 @@ private:
 	bool m_debug;	// default FALSE. Toggle to true with debug_toggle()
 };
 
+command::command() {}
+command::~command() {}
+
+void command::exec(const char *terminal_cmd, bool realtime_terminal_feedback) {
+	
+}
+
+void command::exec(const char *terminal_cmd, std::vector<std::string> &terminal_feedback, std::vector<std::string> &error_list, bool realtime_terminal_feedback) {
+	
+}
 #endif
