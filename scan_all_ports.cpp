@@ -1,4 +1,4 @@
-#include "command.hpp";
+#include "command.hpp"
 
 using std::cout;
 using std::endl;
